@@ -43,7 +43,8 @@ Papa.parse(sheetUrl, {
     header: true,
     skipEmptyLines: true,
     complete: function(results) {
-        allProducts = results.data.filter(p => p.Наличие && p.Наличие.toLowerCase().includes("в наличии"));
+        // фильтруем только «в наличии»
+        allProducts = results.data.filter(p => p.наличие && p.наличие.toLowerCase().includes("в наличии"));
         showProducts(allProducts);
     },
     error: function(err) {
@@ -63,13 +64,13 @@ function showProducts(list) {
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
-      <img src="${p.Фото}" alt="Фото">
-      <h3>${p.Бренд} ${p.Модель}</h3>
-      <p><b>${p.Размер}</b></p>
-      <p>Сезон: ${p.Сезон}</p>
-      <p>Цена: <b>${p.Цена} ₸</b></p>
-      <p>${p.Описание}</p>
-      <a class="buy-btn" href="https://wa.me/WHATSAPP_NUMBER?text=Здравствуйте!%20Интересует%20шина%20${encodeURIComponent(p.Бренд + " " + p.Модель + " " + p.Размер)}" target="_blank">Купить</a>
+      <img src="${p.фото}" alt="Фото">
+      <h3>${p.бренд} ${p.модель}</h3>
+      <p><b>${p.размер}</b></p>
+      <p>Сезон: ${p.сезон}</p>
+      <p>Цена: <b>${p.цена} ₸</b></p>
+      <p>${p.описание}</p>
+      <a class="buy-btn" href="https://wa.me/WHATSAPP_NUMBER?text=Здравствуйте!%20Интересует%20шина%20${encodeURIComponent(p.бренд + " " + p.модель + " " + p.размер)}" target="_blank">Купить</a>
     `;
     container.appendChild(card);
   });
@@ -78,13 +79,13 @@ function showProducts(list) {
 // Поиск по размеру
 document.getElementById("searchSize").addEventListener("input", e => {
   const val = e.target.value.toLowerCase();
-  showProducts(allProducts.filter(p => p.Размер.toLowerCase().includes(val)));
+  showProducts(allProducts.filter(p => p.размер.toLowerCase().includes(val)));
 });
 
 // Фильтр по сезону
 document.getElementById("filterSeason").addEventListener("change", e => {
   const season = e.target.value;
-  showProducts(allProducts.filter(p => !season || p.Сезон === season));
+  showProducts(allProducts.filter(p => !season || p.сезон === season));
 });
 </script>
 
