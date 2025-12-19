@@ -32,26 +32,30 @@ a.buy-btn { display: block; text-align: center; margin-top: 8px; padding: 8px; b
 
 <div id="products">Загрузка...</div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 <script>
-const sheetUrl = "https://opensheet.vercel.app/2PACX-1vRMe3Xbtzrt3WmiYKEOCv5WI_i4_cuR9AX1WxJrNKIHDXya8D1nwSq-YWhXz8wyS1BYWEN1g-bS5-y5/Каталог";
+const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRMe3Xbtzrt3WmiYKEOCv5WI_i4_cuR9AX1WxJrNKIHDXya8D1nwSq-YWhXz8wyS1BYWEN1g-bS5-y5/pub?output=csv";
 let allProducts = [];
 
-fetch(sheetUrl)
-  .then(res => res.json())
-  .then(data => {
-    // Фильтруем только "В наличии"
-    allProducts = data.filter(p => p.Наличие && p.Наличие.toLowerCase().includes("в наличии"));
-    showProducts(allProducts);
-  })
-  .catch(err => {
-    document.getElementById("products").innerHTML = "Ошибка загрузки данных.";
-    console.error(err);
-  });
+// Парсим CSV через PapaParse
+Papa.parse(sheetUrl, {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+    complete: function(results) {
+        allProducts = results.data.filter(p => p.Наличие && p.Наличие.toLowerCase().includes("в наличии"));
+        showProducts(allProducts);
+    },
+    error: function(err) {
+        document.getElementById("products").innerHTML = "Ошибка загрузки данных.";
+        console.error(err);
+    }
+});
 
 function showProducts(list) {
   const container = document.getElementById("products");
   container.innerHTML = "";
-  if(list.length === 0) {
+  if(list.length === 0){
     container.innerHTML = "<p>Нет товаров для отображения</p>";
     return;
   }
@@ -65,7 +69,7 @@ function showProducts(list) {
       <p>Сезон: ${p.Сезон}</p>
       <p>Цена: <b>${p.Цена} ₸</b></p>
       <p>${p.Описание}</p>
-      <a class="buy-btn" href="https://wa.me/77010708660?text=Здравствуйте!%20Интересует%20шина%20${encodeURIComponent(p.Бренд + " " + p.Модель + " " + p.Размер)}" target="_blank">Купить</a>
+      <a class="buy-btn" href="https://wa.me/WHATSAPP_NUMBER?text=Здравствуйте!%20Интересует%20шина%20${encodeURIComponent(p.Бренд + " " + p.Модель + " " + p.Размер)}" target="_blank">Купить</a>
     `;
     container.appendChild(card);
   });
