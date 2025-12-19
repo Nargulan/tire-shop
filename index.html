@@ -39,7 +39,7 @@ let allProducts = [];
 fetch(sheetUrl)
   .then(res => res.json())
   .then(data => {
-    // Отбираем только товары в наличии
+    // Фильтруем только "В наличии"
     allProducts = data.filter(p => p.Наличие && p.Наличие.toLowerCase().includes("в наличии"));
     showProducts(allProducts);
   })
@@ -51,6 +51,10 @@ fetch(sheetUrl)
 function showProducts(list) {
   const container = document.getElementById("products");
   container.innerHTML = "";
+  if(list.length === 0) {
+    container.innerHTML = "<p>Нет товаров для отображения</p>";
+    return;
+  }
   list.forEach(p => {
     const card = document.createElement("div");
     card.className = "card";
@@ -61,7 +65,7 @@ function showProducts(list) {
       <p>Сезон: ${p.Сезон}</p>
       <p>Цена: <b>${p.Цена} ₸</b></p>
       <p>${p.Описание}</p>
-      <a class="buy-btn" href="https://wa.me/WHATSAPP_NUMBER?text=Здравствуйте!%20Интересует%20шина%20${encodeURIComponent(p.Бренд + " " + p.Модель + " " + p.Размер)}" target="_blank">Купить</a>
+      <a class="buy-btn" href="https://wa.me/77010708660?text=Здравствуйте!%20Интересует%20шина%20${encodeURIComponent(p.Бренд + " " + p.Модель + " " + p.Размер)}" target="_blank">Купить</a>
     `;
     container.appendChild(card);
   });
