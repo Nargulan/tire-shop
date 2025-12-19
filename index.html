@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Каталог шин</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; }
+h1 { text-align: center; }
+.controls { text-align: center; margin-bottom: 15px; }
+input, select { margin: 0 5px 10px; padding: 8px; width: 150px; }
+#products { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.card { border: 1px solid #ddd; padding: 10px; width: 260px; box-shadow: 1px 1px 5px rgba(0,0,0,0.1); }
+.card img { width: 100%; height: auto; object-fit: contain; }
+.card h3 { margin: 5px 0; font-size: 18px; }
+.card p { margin: 4px 0; font-size: 14px; }
+a.buy-btn { display: block; text-align: center; margin-top: 8px; padding: 8px; background: #25d366; color: white; text-decoration: none; font-weight: bold; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<h1>Каталог шин</h1>
+
+<div class="controls">
+  <input id="searchSize" type="text" placeholder="Поиск по размеру">
+  <select id="filterSeason">
+    <option value="">Сезон</option>
+    <option value="Зима">Зима</option>
+    <option value="Лето">Лето</option>
+    <option value="Всесезон">Всесезон</option>
+  </select>
+</div>
+
+<div id="products"></div>
+
+<script>
+const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRMe3Xbtzrt3WmiYKEOCv5WI_i4_cuR9AX1WxJrNKIHDXya8D1nwSq-YWhXz8wyS1BYWEN1g-bS5-y5/pub?output=csv";
+let allProducts = [];
+
+fetch(sheetUrl)
+  .then(res => res.text())
+  .then(csv => {
+    const rows = csv.trim().split("\n");
+    const headers = rows.shift().split(",");
+    allProducts = rows.map(r => {
+      const cols = r.split(",");
+      return {
+        ID: cols[0],
+        Бренд: cols[1],
+        Модель: cols[2],
+        Размер: cols[3],
+        Сезон: cols[4],
+        Шипы: cols[5],
+        Тип: cols[6],
+        Цена: cols[7],
+        Наличие: cols[8],
+        Фото: cols[9],
+        Описание: cols[10]
+      };
+    });
+    showProducts(allProducts);
+  });
+
+function showProducts(list) {
+  const container = document.getElementById("products");
+  container.innerHTML = "";
+  list.forEach(p => {
+    if (!p.Наличие || p.Наличие.toLowerCase().indexOf("в наличии") === -1) return;
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <img src="${p.Фото}" alt="Фото">
+      <h3>${p.Бренд} ${p.Модель}</h3>
+      <p><b>${p.Размер}</b></p>
+      <p>Сезон: ${p.Сезон}</p>
+      <p>Цена: <b>${p.Цена} ₸</b></p>
+      <p>${p.Описание}</p>
+      <a class="buy-btn" href="https://wa.me/77010708660?text=Здравствуйте!%20Интересует%20шина%20${encodeURIComponent(p.Бренд + " " + p.Модель + " " + p.Размер)}" target="_blank">Купить</a>
+    `;
+    container.appendChild(card);
+  });
+}
+
+document.getElementById("searchSize").addEventListener("input", e => {
+  const q = e.target.value.toLowerCase();
+  showProducts(allProducts.filter(p => p.Размер.toLowerCase().includes(q)));
+});
+
+document.getElementById("filterSeason").addEventListener("change", e => {
+  const season = e.target.value;
+  showProducts(allProducts.filter(p => !season || p.Сезон === season));
+});
+</script>
+
+</body>
+</html>
